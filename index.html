@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <script
+      defer
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script defer src="script.js"></script>
+    <title>MySpot - Make your spot list</title>
+  </head>
+
+  <body>
+    <div class="header">
+      <a href="#" class="logo">
+        <img class="logo-img" src="img/logo.png" alt="logo image" />
+        <span class="logo-title"> MySpot</span>
+      </a>
+      <nav class="main-nav">
+        <ul class="main-nav-list">
+          <li><a class="main-nav-link" href="#sidebar">New</a></li>
+          <li><a class="main-nav-link" href="#">My List</a></li>
+          <li><a class="main-nav-link" href="#">Story</a></li>
+        </ul>
+      </nav>
+    </div>
+    <section class="section">
+      <div class="sidebar">
+        <h2 class="new-spots-title">NEW SPOT</h2>
+        <ul class="new-spots">
+          <form class="form hidden">
+            <div class="form-row">
+              <label for="select-type" id="select-type">Type</label>
+              <select class="form-input form-input--type">
+                <option value="">Select a type</option>
+                <option value="Cafe">☕️ Cafe</option>
+                <option value="Bakery and Dessert">🥐 Bakery & Dessert</option>
+                <option value="Bar and Pub">🍷 Bar & Pub</option>
+                <option value="Restaurant">🍽️ Restaurant</option>
+                <option value="Stays">🏨 Stays</option>
+                <option value="Attractions">🌎 Attractions</option>
+                <option value="Drive">🚘 Drive</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label for="select-rating" id="select-rating">Rating</label>
+              <select class="form-input form-input--rating">
+                <option value="">Review with stars</option>
+                <option value="star-5">⭐️⭐️⭐️⭐️⭐️</option>
+                <option value="star-4">⭐️⭐️⭐️⭐️</option>
+                <option value="star-3">⭐️⭐️⭐️</option>
+                <option value="star-2">⭐️⭐️</option>
+                <option value="star-1">⭐️</option>
+              </select>
+            </div>
+
+            <div class="form-row text-input place">
+              <label for="text-input">Place</label>
+              <input
+                id="text"
+                class="form-input--place"
+                type="text"
+                size="32"
+                maxlength="38"
+                placeholder="Write a place name"
+                required
+              />
+            </div>
+            <div class="form-row text-input comments">
+              <label for="text-input">Comments</label>
+              <input
+                id="text"
+                class="form-input--comments"
+                type="text"
+                size="32"
+                cols="40"
+                rows="2"
+                maxlength="100"
+                placeholder="Write what you think"
+              />
+            </div>
+            <button class="btn btn--form">SAVE</button>
+          </form>
+
+          <!-- <li class="container spot">
+            <div class="spot-details grid">
+              <span class="spot-date">2023 09 18</span>
+              <span class="spot-rating">⭐️⭐️⭐️</span>
+              <span class="spot-type">☕️ Cafe</span>
+              <span class="spot-place"> starbucks</span>
+              <span class="spot-comment">
+                great coffee, sweet staffgreat coffee, sweet staffgreat coffee,
+                sweet staff</span
+              >
+            </div>
+            <button class="btn btn--list">Delete</button>
+          </li> -->
+        </ul>
+      </div>
+
+      <div id="map"></div>
+    </section>
+  </body>
+</html>
