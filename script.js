@@ -19,6 +19,15 @@ class Spot {
     this.curCoords = curCoords;
     this.place = place;
     this.comments = comments;
+    this._getFormatDate();
+  }
+
+  _getFormatDate() {
+    const year = this.date.getFullYear();
+    const month = String(this.date.getMonth() + 1).padStart(2, "0");
+    const day = String(this.date.getDate()).padStart(2, "0");
+
+    this.format = `${year}-${month}-${day}`;
   }
 }
 
@@ -30,9 +39,9 @@ class App {
   constructor() {
     this._getPosition();
     this._getLocalStorage();
-    btnForm.addEventListener("click", this._newWorkout.bind(this));
+    btnForm.addEventListener("click", this._newSpot.bind(this));
     btnDel.forEach((btn) => {
-      btn.addEventListener("click", this._removeItem.bind(this));
+      btn.addEventListener("click", this._deleteSpot.bind(this));
       console.log("clicked");
     });
   }
@@ -69,7 +78,7 @@ class App {
     console.log(this.mapEvent);
   }
 
-  _newWorkout(e) {
+  _newSpot(e) {
     e.preventDefault();
     const type = inputType.value;
     const rating = inputRating.value;
@@ -77,46 +86,12 @@ class App {
     const comments = inputComments.value;
     const { lat, lng } = this.mapEvent.latlng;
     let spot;
-    // type, rating, curCoords, place, comments
+
     spot = new Spot(type, rating, [lat, lng], place, comments);
     console.log(spot);
 
     this.#spots.push(spot);
     console.log(this.#spots);
-
-    let ratingStars = "";
-
-    if (spot.rating === "star-5") {
-      ratingStars = "⭐️⭐️⭐️⭐️⭐️";
-    } else if (spot.rating === "star-4") {
-      ratingStars = "⭐️⭐️⭐️⭐️";
-    } else if (spot.rating === "star-3") {
-      ratingStars = "⭐️⭐️⭐️";
-    } else if (spot.rating === "star-2") {
-      ratingStars = "⭐️⭐️";
-    } else if (spot.rating === "star-1") {
-      ratingStars = "⭐️";
-    }
-
-    let typeIcon = "";
-    if (spot.type === "Cafe") {
-      typeIcon = "☕️ Cafe";
-    } else if (spot.type === "Bakery and Dessert") {
-      typeIcon = "🥐 Bakery & Dessert";
-    } else if (spot.type === "Bar and Pub") {
-      typeIcon = "🍷 Bar & Pub";
-    } else if (spot.type === "Restaurant") {
-      typeIcon = "🍽️ Restaurant";
-    } else if (spot.type === "Stays") {
-      typeIcon = "🏨 Stays";
-    } else if (spot.type === "Attractions") {
-      typeIcon = "🌎 Attractions";
-    } else if (spot.type === "Drive") {
-      typeIcon = "🚘 Drive";
-    }
-
-    this.#ratingStars = ratingStars;
-    this.#typeIcon = typeIcon;
 
     this._renderSpotMarker(spot);
 
@@ -137,11 +112,70 @@ class App {
     form.classList.add("hidden");
     setTimeout(() => (form.style.display = "grid"), 1000);
   }
+  _replaceStars(spot) {
+    switch (spot.rating) {
+      case "star-1":
+        this.#ratingStars = "⭐️";
+        break;
+      case "star-2":
+        this.#ratingStars = "⭐️⭐️";
+        break;
+      case "star-3":
+        this.#ratingStars = "⭐️⭐️⭐️";
+        break;
+      case "star-4":
+        this.#ratingStars = "⭐️⭐️⭐️⭐️";
+        break;
+      case "star-5":
+        this.#ratingStars = "⭐️⭐️⭐️⭐️⭐️";
+        break;
+      default:
+        console.log("error");
+    }
+  }
 
+  _replaceTypes(spot) {
+    switch (spot.type) {
+      case "cafe":
+        this.#typeIcon = "☕️ Cafe";
+        break;
+      case "bakery and dessert":
+        this.#typeIcon = "🥐 Bakery & Dessert";
+        break;
+      case "bar and pub":
+        this.#typeIcon = "🍷 Bar & Pub";
+        break;
+      case "restaurant":
+        this.#typeIcon = "🍽️ Restaurant";
+        break;
+      case "stays":
+        this.#typeIcon = "🏨 Stays";
+        break;
+      case "attractions":
+        this.#typeIcon = "👣 Attractions";
+        break;
+      case "drive":
+        this.#typeIcon = "🚘 Drive";
+        break;
+      default:
+        console.log("error");
+    }
+  }
+  _deleteSpot(e) {
+    const list = e.target.parentElement;
+
+    this.#spots = this.#spots.filter((spot) => spot.id !== parseInt(list.id));
+    list.remove();
+    this._setLocalStorage();
+  }
   _renderSpot(spot) {
+    this._replaceStars(spot);
+    this._replaceTypes(spot);
+
     let html = `<li class="container spot">
     <div class="spot-details grid">
-      <span class="spot-date">2023 09 18</span>
+      <span class="spot-date">${spot.format}
+      </span>
       <span class="spot-rating">${this.#ratingStars}</span>
       <span class="spot-type">${this.#typeIcon}</span>
       <span class="spot-place">${spot.place}</span>
@@ -155,9 +189,28 @@ class App {
   }
 
   _renderSpotMarker(spot) {
-    L.marker(spot.curCoords)
+    this._replaceStars(spot);
+    this._replaceTypes(spot);
+
+    const myIcon = L.icon({
+      iconUrl: `img/icons/${spot.type}-icon.png`,
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32],
+    });
+
+    L.marker(spot.curCoords, { icon: myIcon })
       .addTo(this.map)
-      .bindPopup(`${spot.type} | ${spot.place}`)
+      .bindPopup(
+        L.popup({
+          maxWidth: 400,
+          closeOnClick: false,
+          closeButton: true,
+          autoClose: false,
+          className: "popup-map",
+        })
+      )
+      .setPopupContent(`${this.#typeIcon} | ${this.#ratingStars}`)
       .openPopup();
   }
 
@@ -165,7 +218,7 @@ class App {
     localStorage.setItem("spots", JSON.stringify(this.#spots));
   }
 
-  _getLocalStorage() {
+  _getLocalStorage(spot) {
     const data = JSON.parse(localStorage.getItem("spots"));
 
     if (!data) return;

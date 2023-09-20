@@ -223,6 +223,7 @@ li {
 .spot-details {
   font-size: 1.4rem;
   row-gap: 0.5rem;
+  width: 100%;
 }
 .spot-date {
   font-size: 1.2rem;
@@ -261,4 +262,8 @@ li {
 #map {
   flex: 1;
   /* height: 100vh; */
+}
+.leaflet-popup .leaflet-popup-content-wrapper {
+  font-size: 0.8rem;
+  font-weight: 600;
 }
