@@ -1,13 +1,12 @@
 "use strict";
 
 const form = document.querySelector(".form");
-const sectionSpot = document.querySelector(".section");
+const containerSpot = document.querySelector(".new-spots");
 const inputType = document.querySelector(".form-input--type");
 const inputRating = document.querySelector(".form-input--rating");
 const inputPlace = document.querySelector(".form-input--place");
 const inputComments = document.querySelector(".form-input--comments");
 const btnForm = document.querySelector(".btn--form");
-const btnDel = document.querySelectorAll(".btn--list");
 
 class Spot {
   date = new Date();
@@ -32,18 +31,17 @@ class Spot {
 }
 
 class App {
+  #map;
   #spots = [];
   #typeIcon = "";
   #ratingStars = "";
+  #markers = [];
 
   constructor() {
     this._getPosition();
     this._getLocalStorage();
     btnForm.addEventListener("click", this._newSpot.bind(this));
-    btnDel.forEach((btn) => {
-      btn.addEventListener("click", this._deleteSpot.bind(this));
-      console.log("clicked");
-    });
+    containerSpot.addEventListener("click", this._moveToSpot.bind(this));
   }
   _getPosition() {
     if (navigator.geolocation)
@@ -60,22 +58,27 @@ class App {
     const { longitude } = position.coords;
 
     const curCoords = [latitude, longitude];
-    this.map = L.map("map").setView(curCoords, 13);
+    this.#map = L.map("map").setView(curCoords, 13);
 
     L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
       maxZoom: 20,
       subdomains: ["mt0", "mt1", "mt2", "mt3"],
-    }).addTo(this.map);
+    }).addTo(this.#map);
 
-    this.map.on("click", this._showForm.bind(this));
+    this.#map.on("click", this._showForm.bind(this));
 
     this.#spots.forEach((spot) => this._renderSpotMarker(spot));
   }
 
   _showForm(mapE) {
     this.mapEvent = mapE;
-    form.classList.remove("hidden");
-    console.log(this.mapEvent);
+    if (form.classList.contains("hidden")) {
+      form.classList.remove("hidden");
+      form.style.display = "grid";
+    } else {
+      form.classList.add("hidden");
+      form.style.display = "none";
+    }
   }
 
   _newSpot(e) {
@@ -91,7 +94,6 @@ class App {
     console.log(spot);
 
     this.#spots.push(spot);
-    console.log(this.#spots);
 
     this._renderSpotMarker(spot);
 
@@ -110,7 +112,6 @@ class App {
         "";
     form.style.display = "none";
     form.classList.add("hidden");
-    setTimeout(() => (form.style.display = "grid"), 1000);
   }
   _replaceStars(spot) {
     switch (spot.rating) {
@@ -143,7 +144,7 @@ class App {
         this.#typeIcon = "🥐 Bakery & Dessert";
         break;
       case "bar and pub":
-        this.#typeIcon = "🍷 Bar & Pub";
+        this.#typeIcon = "🍺 Bar & Pub";
         break;
       case "restaurant":
         this.#typeIcon = "🍽️ Restaurant";
@@ -161,18 +162,34 @@ class App {
         console.log("error");
     }
   }
-  _deleteSpot(e) {
-    const list = e.target.parentElement;
 
-    this.#spots = this.#spots.filter((spot) => spot.id !== parseInt(list.id));
-    list.remove();
-    this._setLocalStorage();
+  _deleteSpot(spotId) {
+    const list = document.querySelector(`[data-id="${spotId}"]`);
+    const spot = this.#spots.find((spot) => spot.id === spotId);
+
+    if (list && spot) {
+      list.remove();
+
+      const marker = this.#markers.find(
+        (marker) => marker._leaflet_id === spot.markerId
+      );
+      console.log(marker);
+      if (marker) {
+        marker.remove();
+        this.#markers = this.#markers.filter((m) => m !== marker);
+      }
+
+      this.#spots = this.#spots.filter((s) => s.id !== spotId);
+
+      this._setLocalStorage();
+    }
   }
+
   _renderSpot(spot) {
     this._replaceStars(spot);
     this._replaceTypes(spot);
 
-    let html = `<li class="container spot">
+    let html = `<li class="container spot" data-id="${spot.id}">
     <div class="spot-details grid">
       <span class="spot-date">${spot.format}
       </span>
@@ -186,6 +203,13 @@ class App {
     <button class="btn btn--list">Delete</button>
   </li>`;
     form.insertAdjacentHTML("afterend", html);
+
+    const deleteButton = form.nextElementSibling.querySelector(".btn--list");
+
+    deleteButton.addEventListener(
+      "click",
+      this._deleteSpot.bind(this, spot.id)
+    );
   }
 
   _renderSpotMarker(spot) {
@@ -199,19 +223,23 @@ class App {
       popupAnchor: [0, -32],
     });
 
-    L.marker(spot.curCoords, { icon: myIcon })
-      .addTo(this.map)
+    const marker = L.marker(spot.curCoords, { icon: myIcon })
+      .addTo(this.#map)
       .bindPopup(
         L.popup({
           maxWidth: 400,
           closeOnClick: false,
           closeButton: true,
           autoClose: false,
-          className: "popup-map",
+          className: `${spot.id}`,
         })
       )
       .setPopupContent(`${this.#typeIcon} | ${this.#ratingStars}`)
       .openPopup();
+
+    this.#markers.push(marker);
+    console.log(this.#markers);
+    spot.markerId = marker._leaflet_id;
   }
 
   _setLocalStorage() {
@@ -222,11 +250,24 @@ class App {
     const data = JSON.parse(localStorage.getItem("spots"));
 
     if (!data) return;
-
     this.#spots = data;
 
     this.#spots.forEach((spot) => this._renderSpot(spot));
+    console.log("Data loaded from local storage:", this.#spots);
   }
+
+  _moveToSpot(e) {
+    const spotEl = e.target.closest(".spot");
+
+    if (!spotEl) return;
+
+    const spotId = spotEl.dataset.id;
+    const spot = this.#spots.find((spot) => spot.id === spotEl.dataset.id);
+
+    console.log(spot);
+    this.#map.setView(spot.curCoords, 13);
+  }
+
   _removeItem() {
     localStorage.removeItem("spots");
     location.reload();
