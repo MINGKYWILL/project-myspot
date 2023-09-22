@@ -189,7 +189,7 @@ class App {
     this._replaceStars(spot);
     this._replaceTypes(spot);
 
-    let html = `<li class="container spot" data-id="${spot.id}">
+    let html = `<li class="spot" data-id="${spot.id}">
     <div class="spot-details grid">
       <span class="spot-date">${spot.format}
       </span>
@@ -200,7 +200,7 @@ class App {
       ${spot.comments}</span
       >
     </div>
-    <button class="btn btn--list">Delete</button>
+    <button class="btn btn--list"><ion-icon name="trash-bin-outline" class="delete"></ion-icon></button>
   </li>`;
     form.insertAdjacentHTML("afterend", html);
 
@@ -227,7 +227,7 @@ class App {
       .addTo(this.#map)
       .bindPopup(
         L.popup({
-          maxWidth: 400,
+          maxWidth: 650,
           closeOnClick: false,
           closeButton: true,
           autoClose: false,

@@ -25,13 +25,14 @@ Paragraph : 1.6
 
 ---02 COLORS
 
-MAIN: 
-TINTS : 
-SHADES:
+MAIN: #4c6ef5 #364fc7 
+TINTS :  #f03e3e
+SHADES: #05091e #0f1631
 ACCENTS: 
-GREYS: #333 #555 #777
+GREYS: #333 #555 #777 #191714
 
 ---05 SHADOWS
+box-shadow: inset 0px 0px 5px -2px rgba(0, 0, 0, 0.4)
 
 ---06 BORDER-RADIUS
 border-radius: 9px, 11px
@@ -52,13 +53,9 @@ html {
   font-size: 62.5%;
 }
 body {
-  font-family: "Lato", sans-serif;
+  font-family: "Roboto", sans-serif;
 }
-.container {
-  max-width: 120rem;
-  /* margin: 0 auto; */
-  padding: 0 3.2rem;
-}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -80,22 +77,19 @@ li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.4rem 4rem;
-  background-color: #ffe8cc;
+  padding: 1.4rem 8rem;
+  background-color: #fff;
+  border-bottom: 0.1px solid #777;
 }
 .logo {
   display: flex;
   align-items: center;
+  height: 5.2rem;
 }
-.logo-title {
-  font-size: 1.6rem;
-  font-weight: 700;
+.logo-img {
+  height: 100%;
 }
-.logo:link,
-.logo:visited {
-  text-decoration: none;
-  color: #191714;
-}
+
 .main-nav-list {
   display: flex;
   align-items: center;
@@ -105,27 +99,26 @@ li {
 .main-nav-link:visited {
   display: inline-block;
   text-decoration: none;
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: 600;
-  color: #333;
+  color: #191714;
   transition: all 0.3s;
 }
 .main-nav-link:hover,
 .main-nav-link:active {
-  color: #f03e3e;
+  color: #4f6af1;
 }
 .section {
   display: flex;
+  justify-content: center;
+  height: calc(100vh - 8.1rem);
+  overflow: hidden;
 }
 
-.new-spots-title {
-  text-align: center;
-  margin-bottom: 2rem;
-}
 .new-spots {
-  min-height: 77vh;
   overflow-y: scroll;
   overflow-x: hidden;
+  padding: 2rem 0;
 }
 .new-spots::-webkit-scrollbar {
   display: none;
@@ -138,19 +131,29 @@ li {
   padding: 4.8rem 3.2em;
   display: flex;
   flex-direction: column;
-  background-color: #ffa94d;
+  background-color: #f3f4f5;
+  border-radius: 11px;
+  box-shadow: inset 0px 0px 5px -2px rgba(0, 0, 0, 0.5);
+  margin: 2rem;
+  margin-right: 0;
 }
 .new-spots-title {
-  font-size: 1.8rem;
   font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  color: #112a46;
+  font-size: 2.4rem;
 }
 .form {
-  margin-bottom: 1.75rem;
-  padding: 1.5rem 2.75rem;
+  margin-bottom: 4rem;
+  padding: 2.5rem 3rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem 2.5rem;
-
+  gap: 2.5rem 2rem;
+  box-shadow: inset 0px 0px 5px -2px rgba(0, 0, 0, 0.5);
+  border: 0.2px solid #555;
+  border-radius: 11px;
   transition: all 0.3s;
 }
 .form.hidden {
@@ -163,7 +166,7 @@ li {
   align-items: center;
 }
 .form-row label {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   line-height: 1rem;
   font-weight: 500;
 }
@@ -171,6 +174,7 @@ li {
   padding: 0.5rem;
   width: 100%;
   border: none;
+  font-size: 1.2rem;
   border-radius: 9px;
   margin-left: 0.4rem;
 }
@@ -197,35 +201,60 @@ li {
   border-radius: 9px;
 }
 .btn--form {
-  align-self: end;
+  display: inline-block;
   grid-row: 4;
-  grid-column: 2 / -1;
-  margin-left: 50%;
+  grid-column: 1 / -1;
+  padding: 1rem 0;
   background-color: #f03e3e;
+  transition: all 0.4s ease-in-out;
   color: #fff;
+}
+.btn--form:hover,
+.btn--form:active {
+  background-image: linear-gradient(
+    to right,
+    #eb3941,
+    #f15e64,
+    #e14e53,
+    #e2373f
+  );
+  box-shadow: 0 5px 15px rgba(242, 97, 103, 0.4);
 }
 /******************/
 /* Spot list */
 /******************/
 .spot {
   width: 100%;
+  max-width: 120rem;
   padding: 1.2rem 2.4rem;
-  border: 1px solid #333;
-  border-radius: 9px;
+  box-shadow: inset 0px 0px 5px -2px rgba(0, 0, 0, 0.4);
+  border-radius: 11px;
   display: flex;
-  gap: 1rem;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.4rem;
-}
-
-.spot-details {
   font-size: 1.4rem;
+  color: #05091e;
+  background-color: #fff;
+  transition: all 0.3s;
+}
+.spot:hover {
+  background-color: #4c6ef5;
+  color: #fff;
+}
+.spot:hover .btn--list {
+  color: #05091e;
+}
+.spot:hover .spot-date {
+  color: #333;
+}
+.spot-details {
   row-gap: 0.5rem;
   width: 100%;
 }
 .spot-date {
   font-size: 1.2rem;
+  color: #555;
   grid-row: 1;
   grid-column: 1/ -1;
 }
@@ -243,16 +272,18 @@ li {
 }
 
 .spot-comment {
-  font-size: 1.4rem;
   grid-row: 4;
   grid-column: 1 / -1;
 }
 
 .btn--list {
-  background-color: #191714;
-  color: #fff;
+  color: #364fc7;
   padding: 0.8rem;
-  border-radius: 100px;
+  background: none;
+}
+
+.delete {
+  font-size: 2.4rem;
 }
 
 /******************/
@@ -260,9 +291,10 @@ li {
 /******************/
 #map {
   flex: 1;
-  /* height: 100vh; */
+  margin: 2rem;
+  border-radius: 9px;
 }
 .leaflet-popup .leaflet-popup-content-wrapper {
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
 }
