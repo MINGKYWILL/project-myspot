@@ -7,6 +7,8 @@ const inputRating = document.querySelector(".form-input--rating");
 const inputPlace = document.querySelector(".form-input--place");
 const inputComments = document.querySelector(".form-input--comments");
 const btnForm = document.querySelector(".btn--form");
+const worldMap = document.querySelector(".world-map");
+const curLocation = document.querySelector(".my-location");
 
 class Spot {
   date = new Date();
@@ -42,6 +44,7 @@ class App {
     this._getLocalStorage();
     btnForm.addEventListener("click", this._newSpot.bind(this));
     containerSpot.addEventListener("click", this._moveToSpot.bind(this));
+    curLocation.addEventListener("click", this._currentLocation.bind(this));
   }
   _getPosition() {
     if (navigator.geolocation)
@@ -60,14 +63,28 @@ class App {
     const curCoords = [latitude, longitude];
     this.#map = L.map("map").setView(curCoords, 13);
 
-    L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}", {
+    L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=en", {
       maxZoom: 20,
       subdomains: ["mt0", "mt1", "mt2", "mt3"],
     }).addTo(this.#map);
 
     this.#map.on("click", this._showForm.bind(this));
+    worldMap.addEventListener("click", this._worldMap.bind(this));
 
     this.#spots.forEach((spot) => this._renderSpotMarker(spot));
+  }
+
+  _worldMap() {
+    if (this.#map) {
+      this.#map.setView([0, 0], 2);
+    } else {
+      this.#map = L.map("map").fitWorld().zoomIn();
+
+      L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=en", {
+        maxZoom: 20,
+        subdomains: ["mt0", "mt1", "mt2", "mt3"],
+      }).addTo(this.#map);
+    }
   }
 
   _showForm(mapE) {
