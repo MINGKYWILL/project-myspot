@@ -7,6 +7,7 @@ const inputRating = document.querySelector(".form-input--rating");
 const inputPlace = document.querySelector(".form-input--place");
 const inputComments = document.querySelector(".form-input--comments");
 const btnForm = document.querySelector(".btn--form");
+const logo = document.querySelector(".logo");
 const worldMap = document.querySelector(".world-map");
 const curLocation = document.querySelector(".my-location");
 
@@ -53,16 +54,14 @@ class App {
     btnForm.addEventListener("click", this._newSpot.bind(this));
     containerSpot.addEventListener("click", this._moveToSpot.bind(this));
     curLocation.addEventListener("click", this._currentLocation.bind(this));
+    logo.addEventListener("click", this._currentLocation.bind(this));
     worldMap.addEventListener("click", this._worldMap.bind(this));
   }
   _getPosition() {
     if (navigator.geolocation)
-      navigator.geolocation.getCurrentPosition(
-        this._loadMap.bind(this),
-        function () {
-          alert("Could not get your location");
-        }
-      );
+      navigator.geolocation.getCurrentPosition(this._loadMap.bind(this), () => {
+        alert("Could not get your loaction");
+      });
   }
 
   _loadMap(position) {
@@ -79,8 +78,6 @@ class App {
 
     this.#map.on("click", this._showForm.bind(this));
     this.#spots.forEach((spot) => this._renderSpotMarker(spot));
-
-    console.log(this.#map);
   }
 
   _currentLocation() {
@@ -109,7 +106,6 @@ class App {
         subdomains: ["mt0", "mt1", "mt2", "mt3"],
       }).addTo(this.#map);
     }
-    console.log(this.#map);
   }
 
   _showForm(mapE) {
