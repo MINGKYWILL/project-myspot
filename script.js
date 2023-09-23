@@ -14,10 +14,10 @@ class Spot {
   date = new Date();
   id = Date.now() + "".slice(-10);
 
-  constructor(type, rating, curCoords, place, comments) {
+  constructor(type, rating, spotCoords, place, comments) {
     this.type = type;
     this.rating = rating;
-    this.curCoords = curCoords;
+    this.spotCoords = spotCoords;
     this.place = place;
     this.comments = comments;
     this._getFormatDate();
@@ -40,40 +40,64 @@ class App {
   #markers = [];
 
   constructor() {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        this.#map.setView([latitude, longitude], 13);
+      },
+      () => {
+        alert("Could not get your loaction");
+      }
+    );
     this._getPosition();
-    this._getLocalStorage();
     btnForm.addEventListener("click", this._newSpot.bind(this));
     containerSpot.addEventListener("click", this._moveToSpot.bind(this));
     curLocation.addEventListener("click", this._currentLocation.bind(this));
+    worldMap.addEventListener("click", this._worldMap.bind(this));
   }
   _getPosition() {
     if (navigator.geolocation)
       navigator.geolocation.getCurrentPosition(
         this._loadMap.bind(this),
         function () {
-          alert("could not get your location");
+          alert("Could not get your location");
         }
       );
   }
 
   _loadMap(position) {
-    const { latitude } = position.coords;
-    const { longitude } = position.coords;
+    const { latitude, longitude } = position.coords;
+    const spotCoords = [latitude, longitude];
 
-    const curCoords = [latitude, longitude];
-    this.#map = L.map("map").setView(curCoords, 13);
-
+    this.#map = L.map("map").setView(spotCoords, 13);
     L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=en", {
       maxZoom: 20,
       subdomains: ["mt0", "mt1", "mt2", "mt3"],
     }).addTo(this.#map);
 
-    this.#map.on("click", this._showForm.bind(this));
-    worldMap.addEventListener("click", this._worldMap.bind(this));
+    this._getLocalStorage();
 
+    this.#map.on("click", this._showForm.bind(this));
     this.#spots.forEach((spot) => this._renderSpotMarker(spot));
+
+    console.log(this.#map);
   }
 
+  _currentLocation() {
+    if (this.#map) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          this.#map.setView([latitude, longitude], 13);
+        },
+        () => {
+          alert("Could not get your loaction");
+        }
+      );
+    } else {
+      this._getPosition();
+    }
+  }
   _worldMap() {
     if (this.#map) {
       this.#map.setView([0, 0], 2);
@@ -85,6 +109,7 @@ class App {
         subdomains: ["mt0", "mt1", "mt2", "mt3"],
       }).addTo(this.#map);
     }
+    console.log(this.#map);
   }
 
   _showForm(mapE) {
@@ -190,7 +215,7 @@ class App {
       const marker = this.#markers.find(
         (marker) => marker._leaflet_id === spot.markerId
       );
-      console.log(marker);
+
       if (marker) {
         marker.remove();
         this.#markers = this.#markers.filter((m) => m !== marker);
@@ -240,7 +265,7 @@ class App {
       popupAnchor: [0, -32],
     });
 
-    const marker = L.marker(spot.curCoords, { icon: myIcon })
+    const marker = L.marker(spot.spotCoords, { icon: myIcon })
       .addTo(this.#map)
       .bindPopup(
         L.popup({
@@ -282,7 +307,7 @@ class App {
     const spot = this.#spots.find((spot) => spot.id === spotEl.dataset.id);
 
     console.log(spot);
-    this.#map.setView(spot.curCoords, 13);
+    this.#map.setView(spot.spotCoords, 13);
   }
 
   _removeItem() {

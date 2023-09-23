@@ -77,9 +77,8 @@ li {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.4rem 8rem;
+  padding: 1.6rem 8rem 0 8rem;
   background-color: #fff;
-  border-bottom: 0.1px solid #777;
 }
 .logo {
   display: flex;
@@ -99,14 +98,18 @@ li {
 .main-nav-link:visited {
   display: inline-block;
   text-decoration: none;
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 600;
   color: #191714;
   transition: all 0.3s;
+  background-color: #dbe4ff;
+  border-radius: 9px;
+  padding: 1rem 1.6rem;
 }
 .main-nav-link:hover,
 .main-nav-link:active {
-  color: #4f6af1;
+  background-color: #3b5bdb;
+  color: #fff;
 }
 .section {
   display: flex;
