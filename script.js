@@ -74,7 +74,7 @@ class App {
       subdomains: ["mt0", "mt1", "mt2", "mt3"],
     }).addTo(this.#map);
 
-    this._getLocalStorage();
+    setTimeout(this._getLocalStorage(), 2000);
 
     this.#map.on("click", this._showForm.bind(this));
     this.#spots.forEach((spot) => this._renderSpotMarker(spot));
@@ -169,7 +169,7 @@ class App {
         this.#ratingStars = "⭐️⭐️⭐️⭐️⭐️";
         break;
       default:
-        console.log("error");
+        throw Error("unknown value");
     }
   }
 
@@ -197,7 +197,7 @@ class App {
         this.#typeIcon = "🚘 Drive";
         break;
       default:
-        console.log("error");
+        throw Error("unknown value");
     }
   }
 
