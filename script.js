@@ -41,45 +41,82 @@ class App {
   #markers = [];
 
   constructor() {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const { latitude, longitude } = position.coords;
-        this.#map.setView([latitude, longitude], 13);
-      },
-      () => {
-        alert("Could not get your loaction");
-      }
-    );
-    this._getPosition();
+    // navigator.geolocation.getCurrentPosition(
+    //   (position) => {
+    //     const { latitude, longitude } = position.coords;
+    //     this.#map.setView([latitude, longitude], 13);
+    //   },
+    //   () => {
+    //     alert("Could not get your loaction");
+    //   }
+    // );
+    // this._getPosition();
+
+    this._loadMap();
+
     btnForm.addEventListener("click", this._newSpot.bind(this));
     containerSpot.addEventListener("click", this._moveToSpot.bind(this));
     curLocation.addEventListener("click", this._currentLocation.bind(this));
     logo.addEventListener("click", this._currentLocation.bind(this));
     worldMap.addEventListener("click", this._worldMap.bind(this));
   }
+
+  // _getPosition() {
+  //   if (navigator.geolocation)
+  //     navigator.geolocation.getCurrentPosition(this._loadMap.bind(this), () => {
+  //       alert("Could not get your loaction");
+  //     });
+  // }
   _getPosition() {
-    if (navigator.geolocation)
-      navigator.geolocation.getCurrentPosition(this._loadMap.bind(this), () => {
-        alert("Could not get your loaction");
+    return new Promise(function (resolve, reject) {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    });
+  }
+
+  // _loadMap(position) {
+  //   const { latitude, longitude } = position.coords;
+  //   const spotCoords = [latitude, longitude];
+
+  //   this.#map = L.map("map").setView(spotCoords, 13);
+  //   L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=en", {
+  //     maxZoom: 20,
+  //     subdomains: ["mt0", "mt1", "mt2", "mt3"],
+  //   }).addTo(this.#map);
+
+  //   this.#map.on("click", this._showForm.bind(this));
+  //   this.#spots.forEach((spot) => this._renderSpotMarker(spot));
+  // }
+  _loadMap() {
+    this._getPosition()
+      .then((position) => {
+        const { latitude: lat, longitude: lng } = position.coords;
+        const spotCoords = [lat, lng];
+
+        this.#map = L.map("map").setView(spotCoords, 13);
+        L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=en", {
+          maxZoom: 20,
+          subdomains: ["mt0", "mt1", "mt2", "mt3"],
+        }).addTo(this.#map);
+
+        return fetch(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}`
+        );
+      })
+      .then((response) => {
+        this._getLocalStorage();
+        this.#map.on("click", this._showForm.bind(this));
+        this.#spots.forEach((spot) => this._renderSpotMarker(spot));
+
+        if (!response.ok)
+          throw new Error(`Problem with API ${response.status}`);
+
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        console.log(`${data.continent} | ${data.city}, ${data.countryName} `);
       });
   }
-
-  _loadMap(position) {
-    const { latitude, longitude } = position.coords;
-    const spotCoords = [latitude, longitude];
-
-    this.#map = L.map("map").setView(spotCoords, 13);
-    L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=en", {
-      maxZoom: 20,
-      subdomains: ["mt0", "mt1", "mt2", "mt3"],
-    }).addTo(this.#map);
-
-    setTimeout(this._getLocalStorage(), 2000);
-
-    this.#map.on("click", this._showForm.bind(this));
-    this.#spots.forEach((spot) => this._renderSpotMarker(spot));
-  }
-
   _currentLocation() {
     if (this.#map) {
       navigator.geolocation.getCurrentPosition(
@@ -110,6 +147,7 @@ class App {
 
   _showForm(mapE) {
     this.mapEvent = mapE;
+
     if (form.classList.contains("hidden")) {
       form.classList.remove("hidden");
       form.style.display = "grid";
@@ -121,6 +159,7 @@ class App {
 
   _newSpot(e) {
     e.preventDefault();
+    // console.log(this.mapEvent);
     const type = inputType.value;
     const rating = inputRating.value;
     const place = inputPlace.value;
@@ -276,7 +315,7 @@ class App {
       .openPopup();
 
     this.#markers.push(marker);
-    console.log(this.#markers);
+
     spot.markerId = marker._leaflet_id;
   }
 
@@ -288,6 +327,12 @@ class App {
     const data = JSON.parse(localStorage.getItem("spots"));
 
     if (!data) return;
+
+    this.#map.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        this.#map.removeLayer(layer);
+      }
+    });
     this.#spots = data;
 
     this.#spots.forEach((spot) => this._renderSpot(spot));
