@@ -266,9 +266,25 @@ class App {
     this._replaceStars(spot);
     this._replaceTypes(spot);
 
-    let html = `<li class="spot" data-id="${spot.id}">
+    console.log(spot);
+
+    return fetch(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${spot.spotCoords[0]}&longitude=${spot.spotCoords[1]}`
+    )
+      .then((response) => {
+        console.log(response);
+        if (!response.ok)
+          throw new Error(`Problem with API ${response.status}`);
+        return response.json();
+      })
+      .then((data) => {
+        console.log(data);
+        const countryName = data.countryName.replace(/\([^)]+\)/, "").trim();
+        let html = `<li class="spot" data-id="${spot.id}">
     <div class="spot-details grid">
       <span class="spot-date">${spot.format}
+      </span>
+      <span class="spot-city">${data.city}, ${countryName}
       </span>
       <span class="spot-rating">${this.#ratingStars}</span>
       <span class="spot-type">${this.#typeIcon}</span>
@@ -279,14 +295,16 @@ class App {
     </div>
     <button class="btn btn--list"><ion-icon name="trash-bin-outline" class="delete"></ion-icon></button>
   </li>`;
-    form.insertAdjacentHTML("afterend", html);
+        form.insertAdjacentHTML("afterend", html);
 
-    const deleteButton = form.nextElementSibling.querySelector(".btn--list");
+        const deleteButton =
+          form.nextElementSibling.querySelector(".btn--list");
 
-    deleteButton.addEventListener(
-      "click",
-      this._deleteSpot.bind(this, spot.id)
-    );
+        deleteButton.addEventListener(
+          "click",
+          this._deleteSpot.bind(this, spot.id)
+        );
+      });
   }
 
   _renderSpotMarker(spot) {

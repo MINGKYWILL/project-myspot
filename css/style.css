@@ -183,26 +183,32 @@
   color: #333;
 }
 .spot-details {
-  row-gap: 0.5rem;
+  row-gap: 0.8rem;
   width: 100%;
 }
 .spot-date {
   font-size: 1.2rem;
   color: #555;
   grid-row: 1;
+  grid-column: 1;
+}
+.spot-city {
+  font-size: 1rem;
+  color: #555;
+  grid-row: 2;
   grid-column: 1/ -1;
 }
 .spot-place {
   grid-row: 3;
-  grid-column: 1/ -1;
+  grid-column: 2/ -1;
 }
 .spot-type {
-  grid-row: 2;
-  grid-column: 2 / -1;
+  grid-row: 3;
+  grid-column: 1;
 }
 .spot-rating {
-  grid-row: 2;
-  grid-column: 1;
+  grid-row: 1;
+  grid-column: 2/-1;
 }
 
 .spot-comment {
