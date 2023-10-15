@@ -41,17 +41,6 @@ class App {
   #markers = [];
 
   constructor() {
-    // navigator.geolocation.getCurrentPosition(
-    //   (position) => {
-    //     const { latitude, longitude } = position.coords;
-    //     this.#map.setView([latitude, longitude], 13);
-    //   },
-    //   () => {
-    //     alert("Could not get your loaction");
-    //   }
-    // );
-    // this._getPosition();
-
     this._loadMap();
 
     btnForm.addEventListener("click", this._newSpot.bind(this));
@@ -61,31 +50,12 @@ class App {
     worldMap.addEventListener("click", this._worldMap.bind(this));
   }
 
-  // _getPosition() {
-  //   if (navigator.geolocation)
-  //     navigator.geolocation.getCurrentPosition(this._loadMap.bind(this), () => {
-  //       alert("Could not get your loaction");
-  //     });
-  // }
   _getPosition() {
     return new Promise(function (resolve, reject) {
       navigator.geolocation.getCurrentPosition(resolve, reject);
     });
   }
 
-  // _loadMap(position) {
-  //   const { latitude, longitude } = position.coords;
-  //   const spotCoords = [latitude, longitude];
-
-  //   this.#map = L.map("map").setView(spotCoords, 13);
-  //   L.tileLayer("http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=en", {
-  //     maxZoom: 20,
-  //     subdomains: ["mt0", "mt1", "mt2", "mt3"],
-  //   }).addTo(this.#map);
-
-  //   this.#map.on("click", this._showForm.bind(this));
-  //   this.#spots.forEach((spot) => this._renderSpotMarker(spot));
-  // }
   _loadMap() {
     this._getPosition()
       .then((position) => {
@@ -266,8 +236,6 @@ class App {
     this._replaceStars(spot);
     this._replaceTypes(spot);
 
-    console.log(spot);
-
     return fetch(
       `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${spot.spotCoords[0]}&longitude=${spot.spotCoords[1]}`
     )
@@ -281,7 +249,7 @@ class App {
         console.log(data);
         const countryName = data.countryName.replace(/\([^)]+\)/, "").trim();
         let html = `<li class="spot" data-id="${spot.id}">
-    <div class="spot-details grid">
+      <div class="spot-details grid">
       <span class="spot-date">${spot.format}
       </span>
       <span class="spot-city">${data.city}, ${countryName}
@@ -290,8 +258,7 @@ class App {
       <span class="spot-type">${this.#typeIcon}</span>
       <span class="spot-place">${spot.place}</span>
       <span class="spot-comment">
-      ${spot.comments}</span
-      >
+      ${spot.comments}</span>
     </div>
     <button class="btn btn--list"><ion-icon name="trash-bin-outline" class="delete"></ion-icon></button>
   </li>`;

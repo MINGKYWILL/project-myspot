@@ -177,23 +177,26 @@
   color: #fff;
 }
 .spot:hover .btn--list {
-  color: #05091e;
+  color: #f03e3e;
 }
 .spot:hover .spot-date {
-  color: #333;
+  color: #fff;
+}
+.spot:hover .spot-city {
+  color: #fff;
 }
 .spot-details {
   row-gap: 0.8rem;
   width: 100%;
 }
 .spot-date {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: #555;
   grid-row: 1;
   grid-column: 1;
 }
 .spot-city {
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: #555;
   grid-row: 2;
   grid-column: 1/ -1;
@@ -217,7 +220,7 @@
 }
 
 .btn--list {
-  color: #364fc7;
+  color: #f03e3e;
   padding: 0.8rem;
   background: none;
 }
